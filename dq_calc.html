@@ -1,0 +1,175 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <title>DQ轴电感计算</title>
+    <script src="https://cdn.jsdelivr.net/npm/mathjs@11.6.0/lib/browser/math.min.js"></script>
+    <script type="text/javascript"
+            src="https://cdn.mathjax.org/mathjax/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML">
+    </script>
+    <script>
+        function calculate() {
+            // 获取输入值
+            const L_AA = parseFloat(document.getElementById("L_AA").value)*1e-3;
+            const L_AB = parseFloat(document.getElementById("L_AB").value)*1e-3;
+            const L_AC = parseFloat(document.getElementById("L_AB").value)*1e-3;
+            const L_BB = parseFloat(document.getElementById("L_BB").value)*1e-3;
+            const L_BC = parseFloat(document.getElementById("L_BC").value)*1e-3;
+            const L_CC = parseFloat(document.getElementById("L_CC").value)*1e-3;
+            let theta = parseFloat(document.getElementById("theta").value) * math.PI / 180;
+
+
+            let mat_L_abc = math.matrix([
+                [L_AA, L_AB, L_AC],
+                [L_AB, L_BB, L_BC],
+                [L_AC, L_BC, L_CC]
+            ]);
+            // console.log(mat_L_abc)
+            // 计算 sin123及cos123
+            const sin0 = math.sin(theta);
+            const sin1 = math.sin(theta - 2 / 3 * math.PI);
+            const sin2 = math.sin(theta - 4 / 3 * math.PI);
+
+            const cos0 = math.cos(theta);
+            const cos1 = math.cos(theta - 2 / 3 * math.PI);
+            const cos2 = math.cos(theta - 4 / 3 * math.PI);
+
+            let C = math.matrix([
+                [cos0, sin0, 1],
+                [cos1, sin1, 1],
+                [cos2, sin2, 1]
+            ]);
+            let inv_C = math.inv(C);
+            // 验证一下矩阵计算是否有问题，正常不死用这个
+            // let C_T = math.multiply(2/3,math.matrix([
+            //     [cos0,cos1, cos2],
+            //     [sin0, sin1, sin2],
+            //     [0.5, 0.5, 0.5]
+            // ]));
+            //
+            // console.log(`C*CT=\n${math.multiply(C,C_T)}`)
+            // console.log(`C*inv_c=\n${math.multiply(C,inv_C)}`)
+
+
+            // 如果无法使用矩阵，则使用下列方法计算Labc dq
+            // const Lad = L_AA * cos0 + L_AB * cos1 + L_AC * cos2;
+            // const Laq = L_AA * sin0 + L_AB * sin1 + L_AC * sin2;
+            // const Lbd = L_AB * cos0 + L_BB * cos1 + L_BC * cos2;
+            // const Lbq = L_AB * sin0 + L_BB * sin1 + L_BC * sin2;
+            // const Lcd = L_AC * cos0 + L_BC * cos1 + L_CC * cos2;
+            // const Lcq = L_AC * sin0 + L_BC * sin1 + L_CC * sin2;
+            // 计算Ld和Lq
+            // const Ld = (Lad * cos0 + Lbd * cos1 + Lcd * cos2) * 2 / 3;
+            // const Lq = (Laq * sin0 + Lbq * sin1 + Lcq * sin2) * 2 / 3;
+
+            // 如果可以使用矩阵计算，则使用下列方法
+            let mat_Ldq0 = math.multiply(math.multiply(inv_C, mat_L_abc), C);
+            console.log(`${mat_Ldq0}`)
+            // console.log(`Lq=${mat_Ldq0.subset(math.index(1, 1))}`)
+            let Ld=mat_Ldq0.subset(math.index(0, 0))*1e3;
+            let Lq=mat_Ldq0.subset(math.index(1, 1))*1e3;
+            // 显示结果
+            document.getElementById("result").innerHTML = `Ld = ${Ld.toFixed(4)} mH, Lq = ${Lq.toFixed(4)} mH`;
+        }
+    </script>
+    <style>
+        td {
+            text-align: center;
+        }
+    </style>
+
+</head>
+<body>
+<h1>电感计算器</h1>
+<p>输入L_A、L_B和L_C的值（单位：毫亨 （mH））：</p>
+
+<form>
+    <label for="L_AA">L_AA:</label>
+    <input type="text" id="L_AA" name="L_AA" value="21.212"><br><br>
+
+    <label for="L_AA">L_AB:</label>
+    <input type="text" id="L_AB" name="L_AB" value="-9.434"><br><br>
+
+    <label for="L_AA">L_AC:</label>
+    <input type="text" id="L_AC" name="L_AC" value="-9.434"><br><br>
+
+    <label for="L_BB">L_BB:</label>
+    <input type="text" id="L_BB" name="L_BB" value="24.171"><br><br>
+
+    <label for="L_AA">L_BC:</label>
+    <input type="text" id="L_BC" name="L_BC" value="-12.112"><br><br>
+
+    <label for="L_CC">L_CC:</label>
+    <input type="text" id="L_CC" name="L_CC" value="24.173"><br><br>
+
+    <label for="theta">theta(degree):</label>
+    <input type="text" id="theta" name="theta" value="0"><br><br>
+
+    <input type="button" onclick="calculate()" value="计算"><br><br>
+
+    <label for="result">结果：</label>
+    <span id="result"></span>
+</form>
+
+<br>
+
+<br>
+<br>
+<br>
+计算公式：
+
+$$
+i_{abc}=Ci_{dq0} \tag{1}
+$$
+
+$$
+\begin{align}
+\psi_{dq0}
+&= C^{-1}\psi_{abc} \\
+&= C^{-1}L_{abc}i_{abc} \\
+&=  C^{-1}L_{abc}Ci_{dq0}\\
+&= L_{dq0}i_{dq0} \tag{2}
+\end{align}
+$$
+$$
+L_{dq0}=C^{-1}L_{abc}C \tag{3}
+$$
+
+其中，
+$$
+L_{abc} =
+\begin{bmatrix}
+L_{aa} & L_{ab} & L_{ac}\\
+L_{ba} & L_{bb} & L_{bc}\\
+L_{ca} & L_{cb} & L_{cc}\\
+\end{bmatrix}\tag{4}
+
+$$
+
+$$
+L_{dq0}=
+\begin{bmatrix}
+L_{dd} & L_{dq} & L_{d0}\\
+L_{qd} & L_{qq} & L_{q0}\\
+L_{0d} & L_{0q} & L_{00}\\
+\end{bmatrix}\tag{5}
+$$
+
+$$
+C=\begin{bmatrix}
+cos\theta & -sin\theta & 1\\
+cos(\theta-120^\circ) & -sin(\theta-120^\circ) & 1\\
+cos(\theta+120^\circ) & -sin(\theta+120^\circ) & 1\\
+\end{bmatrix}\tag{6}
+$$
+
+$$
+C^{-1}=\frac{2}{3}\begin{bmatrix}
+cos\theta & cos(\theta-120^\circ) & cos(\theta+120^\circ) \\
+-sin\theta & -sin(\theta-120^\circ) & -sin(\theta+120^\circ)\\
+\frac{1}{2} & \frac{1}{2} & \frac{1}{2}\\
+\end{bmatrix}\tag{7}
+$$
+
+</body>
+</html>
