@@ -35,22 +35,28 @@ L_{dq0}=C^{-1}L_{abc}C \tag{3}
 $$
 
 其中，
+
 $$
 L_{abc} =
 \begin{bmatrix}
-L_{aa} & L_{ab} & L_{ac}\\
-L_{ba} & L_{bb} & L_{bc}\\
-L_{ca} & L_{cb} & L_{cc}\\
+
+L_{aa} & L_{ab} & L_{ac} \\
+L_{ba} & L_{bb} & L_{bc} \\
+L_{ca} & L_{cb} & L_{cc} \\
+
 \end{bmatrix}\tag{4}
 $$
 
 $$
 L_{dq0}=
 \begin{bmatrix}
-L_{dd} & L_{dq} & L_{d0}\\
-L_{qd} & L_{qq} & L_{q0}\\
-L_{0d} & L_{0q} & L_{00}\\
-\end{bmatrix}\tag{5}
+
+L_{dd} & L_{dq} & L_{d0} \\
+L_{qd} & L_{qq} & L_{q0} \\
+L_{0d} & L_{0q} & L_{00} \\
+
+\end{bmatrix}
+\tag{5}
 $$
 
 $$
