@@ -6,13 +6,13 @@
 
 
 ## 用法
-在labc矩阵中输入L_A, L_B, L_C的值。
-输入电机的极对数和电机的相电阻。
+在labc矩阵中输入L_A, L_B, L_C的自感、互感值。
+
 点击"计算"按钮，即可得到dq轴电感Ld和Lq的值。
 ## 注意事项
-该计算器使用mathjs和katex库，需要在浏览器中启用JavaScript。
+该计算器使用mathjs和mathjax库，需要在浏览器中启用JavaScript。
 输入的参数必须是数字。
-极对数必须是整数。
+
 ## 公式
 dq轴电感Ld和Lq的计算公式如下：
 
@@ -29,6 +29,7 @@ $$
 &= L_{dq0}i_{dq0} \tag{2}
 \end{align}
 $$
+
 $$
 L_{dq0}=C^{-1}L_{abc}C \tag{3}
 $$
@@ -41,7 +42,6 @@ L_{aa} & L_{ab} & L_{ac}\\
 L_{ba} & L_{bb} & L_{bc}\\
 L_{ca} & L_{cb} & L_{cc}\\
 \end{bmatrix}\tag{4}
-
 $$
 
 $$
